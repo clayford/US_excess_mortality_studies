@@ -12,8 +12,10 @@ outdir <- "./output/"
 indir <- "./input/"
 
 # Read in observed deaths data
-dat_monthly <- read.csv(paste0(datadir,"monthly data.csv"), sep=',', header=TRUE)%>%
-  mutate(date_yr_mnth = as.Date(date_yr_mnth, format="%m/%d/%Y"))
+# dat_monthly <- read.csv(paste0(datadir,"monthly data.csv"), sep=',', header=TRUE)%>%
+#   mutate(date_yr_mnth = as.Date(date_yr_mnth, format="%m/%d/%Y"))
+
+dat_monthly <- read.csv("data/monthly data.csv")
 
 # Read in estimates from the CDC
 cdc_excess <- read.csv(paste0(datadir,"CDC Excess Deaths/Excess_Deaths_Associated_with_COVID-19.csv"), sep=',', header=TRUE) %>%
@@ -47,7 +49,7 @@ write.csv(wmd_yearly,file=paste0(outdir,"wmd_yearly.csv"), row.names = FALSE)
 # Link to developer's repository: https://github.com/WHOexcessc19/Codebase
 # The below code is adapted from spline_model_monthly.R and Final_Sampling.R, for the US case study.
 
-dat_mo_f1 <- dat_monthly %>% rename(observed = outcome)
+dat_mo_f1 <- dat_monthly %>% rename(observed = Deaths)
 dat_mo_f1$iso3 <- "USA"
 observed2020 <- dat_mo_f1 %>% 
   rename(date = date_yr_mnth) %>%

@@ -5,15 +5,16 @@ library(lubridate)
 library(excessmort)
 library(tidyverse)
 
-setwd("[insert file path to working directory]")
-codedir<-"./code/"
-datadir<-"./data/"
+# setwd("[insert file path to working directory]")
+# codedir<-"./code/"
+# datadir<-"./data/"
 
 end_date_ymd <- "2024-12-31"
 
 # ------------------------ Data Preparation ------------------------
 ## Download data from CDC Wonder
-library(cdcwonder)
+# library(cdcwonder)
+# library(wonderapi)
 
 df_final <- cdcwonder::wonder(
   database   = "d76_mortality",       # final 1999–2020
@@ -21,8 +22,10 @@ df_final <- cdcwonder::wonder(
   start_year = 2014,
   end_year   = 2020,
   measure    = "Deaths",              # all-cause mortality
-  api_key    = NULL                 
+  api_key    = NULL
 )
+
+
 
 
 df_prov <- cdcwonder::wonder(
@@ -35,7 +38,7 @@ df_prov <- cdcwonder::wonder(
 )
 
 ## Get population from United States Census
-source(paste0(codedir,"census-key.R"))  
+source("Case_Study/census-key.R")  
 
 api <- "https://api.census.gov/data/2019/pep/population"
 pop1 <- request(api) |>  
@@ -58,13 +61,24 @@ cols <- paste0("POPESTIMATE", years)
 pop2 <- data.table(year = years, population = unlist(pop2[,..cols]))
 
 pop <- rbindlist(list(pop1,pop2))[order(year)]
-dat <- merge(dat, pop, by = "date", all.x = TRUE)
+
+# CF: I had to add this
+dat <- read.csv("Case_Study/CDC_Wonder_Data_Locked_Nov_28_2025/Multiple Cause of Death, 1999-2020.csv")
+dat$Notes <- NULL
+dat <- subset(dat, !is.na(Year))
+dat <- subset(dat, Month != "")
+names(dat)[c(1,3)] <- c("year", "month")
+
+
+# CF: I had to change this
+dat <- merge(dat, pop, by = "year", all.x = TRUE)
+dat$month<- month(my(dat$month))
 
 ## Create additional variables for analysis
-dat_monthly <- dat %>%
-  mutate(year = as.numeric(format(as.Date(date, format="%m/%d/%Y"),"%Y")),
-         month = as.numeric(format(as.Date(date, format="%m/%d/%Y"),"%m")),
-         date_yr_mnth = make_date(year = year, month = month)
-  )
+dat <- dat %>%
+  mutate(date_yr_mnth = make_date(year = year, month = month))
 
-write.csv(dat_monthly,file=paste0(datadir,"/monthly data.csv"), row.names = FALSE)
+# add 2022 - 2024
+
+
+write.csv(dat_monthly,file="data/monthly data.csv", row.names = FALSE)
