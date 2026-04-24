@@ -8,7 +8,7 @@
 
 # User-specific files
 .Ruserdata
-/Case_Study/census-key.R
+Case_Study/census-key.R
 
 # Example code in package build process
 *-Ex.R
