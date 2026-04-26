@@ -79,6 +79,8 @@ dat <- dat %>%
   mutate(date_yr_mnth = make_date(year = year, month = month))
 
 # add 2022 - 2024
-
+years <- rep(2022:2024, each = 12)
+months <- rep(1:12, 3)
+test <- data.frame(year = years, month = months)
 
 write.csv(dat_monthly,file="data/monthly data.csv", row.names = FALSE)
